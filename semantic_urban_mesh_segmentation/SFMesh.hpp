@@ -323,7 +323,8 @@ namespace semantic_mesh_segmentation
 		this->remove_face_property(this->get_face_predict_label);
 		this->remove_face_property(this->get_face_segment_id);
 		this->remove_face_property(this->get_face_color);
-		this->remove_face_property(this->get_face_property<std::vector<int>>("f:mesh_faces_id"));
+		auto property = this->get_face_property<std::vector<int>>("f:mesh_faces_id");
+		this->remove_face_property(property);
 	}
 
 	inline void SFMesh::add_segment_properties

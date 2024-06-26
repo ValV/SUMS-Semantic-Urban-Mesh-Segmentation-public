@@ -214,7 +214,8 @@ namespace semantic_mesh_segmentation
 
 		this->add_vertex_property<int>("v:segment_id", -1);
 		auto seg_id = this->get_vertex_property<int>("v:segment_id");
-		add_segment_properties(p_faces, std::string("v:mesh_faces_id"));
+		auto seg_property = std::string("v:mesh_faces_id");
+		add_segment_properties(p_faces, seg_property);
 
 		//properties for watershed segmentation
 		this->add_vertex_property<float>("v:segment_relative_elevation", -1);
@@ -342,7 +343,8 @@ namespace semantic_mesh_segmentation
 		PointCloud::VertexProperty < std::vector<float> > p_eigen_feas, p_color_feas;
 		std::map<int, bool> use_feas = { {0, false}, {1, false}, {2, false}, {3, false}};
 
-		get_segment_properties(pcl, p_faces, std::string("v:mesh_faces_id"));
+		auto seg_property = std::string("v:mesh_faces_id");
+		get_segment_properties(pcl, p_faces, seg_property);
 		for (auto sf : selected_pcl_vertex_features)
 		{
 			switch (sf.second)

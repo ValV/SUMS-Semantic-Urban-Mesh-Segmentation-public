@@ -1,0 +1,9 @@
+FROM ubuntu:20.04
+
+RUN apt update && \
+    apt install build-essential cmake git vim \
+                libboost-all-dev libboost-numpy-dev \
+                python3-dev python3-numpy-dev python3-opencv libopencv-dev \
+                libeigen3-dev libgmp-dev libmpfr-dev \
+                libprotobuf-dev libprotobuf-c-dev \
+                freeglut3-dev libcgal-dev

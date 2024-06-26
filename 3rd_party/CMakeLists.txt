@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
+include_directories(${CMAKE_SOURCE_DIR}/../)
+include_directories(${CMAKE_SOURCE_DIR}/)
 add_subdirectory("easy3d")
 add_subdirectory("rply")
 add_subdirectory("tinyfiledialogs")

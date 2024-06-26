@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <vector>
 #include <boost/python.hpp>
-#include <boost/numpy.hpp>
+#include <boost/python/numpy.hpp>
 #include <numpy/ndarrayobject.h>
 #include "boost/tuple/tuple.hpp"
 #include "boost/python/object.hpp"
@@ -13,7 +13,7 @@
 #include <easy3d/point_cloud_io.h>
 #include <easy3d/surface_mesh_io.h>
 
-namespace bpn = boost::numpy;
+namespace bpn = boost::python::numpy;
 namespace bp =  boost::python;
 
 //typedef boost::tuple< std::vector< std::vector<uint32_t> >, std::vector<uint32_t> > Custom_tuple;
@@ -200,7 +200,8 @@ void get_all_feature_properties_from_feature_point_cloud
 		{"v:multiscale_elevation_features", 3}
 	};
 
-	get_segment_properties(pcl, p_faces, std::string("v:mesh_faces_id"));
+	auto id_faces = std::string("v:mesh_faces_id");
+	get_segment_properties(pcl, p_faces, id_faces);
 	for (auto sf : selected_pcl_vertex_features)
 	{
 		switch (sf.second)
@@ -285,8 +286,8 @@ PyObject *read_data_for_augmentation
 {
 	//read *.ply
 	std::ostringstream pcl_str_ostemp;
-	std::string read_data_path = bp::extract<char const *>(read_data_path_py);
-	std::string labels_name_size_str = bp::extract<char const *>(labels_name_size_bpstr);
+	auto read_data_path = std::string(bp::extract<char const *>(read_data_path_py));
+	auto labels_name_size_str = std::string(bp::extract<char const *>(labels_name_size_bpstr));
 	int labels_name_size = std::stoi(labels_name_size_str);
 
 	std::cout << "	Start to read data for parsing to python " << read_data_path << std::endl;
@@ -419,7 +420,7 @@ void write_data_for_augmentation
 {
 	//read *.ply
 	std::ostringstream pcl_str_ostemp_in;
-	std::string read_data_path = bp::extract<char const *>(read_data_path_py);
+	auto read_data_path = std::string(bp::extract<char const *>(read_data_path_py));
 	pcl_str_ostemp_in << read_data_path;
 	std::string pcl_str_temp_in = pcl_str_ostemp_in.str().data();
 	char * pclPath_temp_in = (char *)pcl_str_temp_in.data();
@@ -430,12 +431,12 @@ void write_data_for_augmentation
 
 	//create output *.ply
 	std::ostringstream pcl_str_ostemp_out;
-	std::string write_data_path = bp::extract<char const *>(write_data_path_py);
+	auto write_data_path = std::string(bp::extract<char const *>(write_data_path_py));
 	pcl_str_ostemp_out << write_data_path;
 	std::string pcl_str_temp_out = pcl_str_ostemp_out.str().data();
 	char * pclPath_temp_out = (char *)pcl_str_temp_out.data();
 
-	std::string labels_name_size_str = bp::extract<char const *>(labels_name_size_bpstr);
+	auto labels_name_size_str = std::string(bp::extract<char const *>(labels_name_size_bpstr));
 	int labels_name_size = std::stoi(labels_name_size_str);
 
 	update_all_feature_properties_for_feature_point_cloud

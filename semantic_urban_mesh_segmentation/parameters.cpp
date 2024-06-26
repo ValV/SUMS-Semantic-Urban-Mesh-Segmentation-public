@@ -352,12 +352,12 @@ namespace semantic_mesh_segmentation
 
 	std::map<int, int> superfacet_id_index_map = std::map<int, int>();
 
-	//file or format names
+	// File or format names
 	std::vector<std::string> ignored_str = { "classification", "mesh", "groundtruth", "L0", "L1", "L2", "veg", "car" };
 	std::vector<std::string> batch_ignored_str = { "Tile" };
-	std::string batch_delim_separate_char = "_+";//"_" for Den Haag; "_+" for Helsinki
+	std::string batch_delim_separate_char = "_+";  //"_" for Den Haag; "_+" for Helsinki
 
-	//****************** files / folders / format / feature names ******************
+	// ****************** files / folders / format / feature names ******************
 	std::vector<std::string> file_formats
 	{
 		"ply",
@@ -366,17 +366,17 @@ namespace semantic_mesh_segmentation
 
 	std::vector<std::string> folder_names_level_0
 	{
-		"evaluation/",//0
-		"feature/",//1
-		"input/",//2
-		"model/",//3
-		"output/",//4
-		"pointcloud/",//5
-		"segments/",//6
-		"visualization/",//7
-		"sota/",//8
-		"sampled_pointcloud/", //9
-		"semantic_pointcloud/" //10
+		"evaluation/",  //0
+		"feature/",  //1
+		"input/",  //2
+		"model/",  //3
+		"output/",  //4
+		"pointcloud/",  //5
+		"segments/",  //6
+		"visualization/",  //7
+		"sota/",  //8
+		"sampled_pointcloud/",  //9
+		"semantic_pointcloud/"  //10
 	};
 
 	std::vector<std::string> folder_names_level_1
@@ -390,21 +390,21 @@ namespace semantic_mesh_segmentation
 
 	std::vector<std::string> prefixs
 	{
-		"_pcl_",//0
-		"_error",//1
-		"sampled",//2
-		"feas",//3
-		"_mesh_",//4
-		"classification",//5
-		"_evaluation",//6
-		"seg",//7
-		"truth",//8
-		"batch_",//9
-		"ele",//10
-		"tex",//11
-		"_class_statistics",//12
-		"feature_bank_importance",//13
-		"_aug"//14
+		"_pcl_",  // 0
+		"_error",  // 1
+		"sampled",  // 2
+		"feas",  // 3
+		"_mesh_",  // 4
+		"classification",  // 5
+		"_evaluation",  // 6
+		"seg",  // 7
+		"truth",  // 8
+		"batch_",  // 9
+		"ele",  // 10
+		"tex",  // 11
+		"_class_statistics",  // 12
+		"feature_bank_importance",  // 13
+		"_aug"  // 14
 	};
 
 	std::vector<std::string> data_types
@@ -419,7 +419,7 @@ namespace semantic_mesh_segmentation
 	{
 		"TextureFile",
 		"label",
-		"unclassified", //labeled as unclassified
+		"unclassified",  // labeled as unclassified
 		"unlabeled"
 	};
 
@@ -428,7 +428,7 @@ namespace semantic_mesh_segmentation
 		{"v:segment_basic_features", 0},
 		{"v:segment_eigen_features", 1},
 		{"v:segment_color_features", 2},
-		{"v:multiscale_elevation_features", 3} //relative to local minimum elevation of points
+		{"v:multiscale_elevation_features", 3}  //relative to local minimum elevation of points
 	};
 
 	std::vector<std::pair<std::string, int>> selected_mesh_face_features
@@ -436,7 +436,7 @@ namespace semantic_mesh_segmentation
 		{"f:segment_basic_features_", 0},
 		{"f:segment_eigen_features_", 1},
 		{"f:segment_color_features_", 2},
-		{"f:multiscale_elevation_features_", 3} //relative to local minimum elevation of points
+		{"f:multiscale_elevation_features_", 3}  //relative to local minimum elevation of points
 	};
 
 	std::vector<std::pair<std::string, int>> basic_feature_base_names
@@ -444,7 +444,7 @@ namespace semantic_mesh_segmentation
 		{"avg_center_z", 0},
 		{"interior_mat_radius", 1},
 		{"sum_area", 2},
-		{"relative_elevation", 3}, //relative to local ground which defined as local largest lower segment
+		{"relative_elevation", 3},  //relative to local ground which defined as local largest lower segment
 		{"triangle_density", 4}
 	};
 

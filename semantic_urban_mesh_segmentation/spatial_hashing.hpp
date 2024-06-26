@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <easy3d/point_cloud.h>
 #include <unordered_map>
+
 #define __int64 long long
 #define __cdecl 
 #define STDEXT stdext
@@ -516,15 +517,14 @@ namespace semantic_mesh_segmentation {
 			CoordType &voxel = this->voxel;
 
 			int _size=(int)std::distance<OBJITER>(_oBegin,_oEnd);
-			if(!_bbox.IsNull()) this->bbox=_bbox;
-			else
-			{
-					for(i = _oBegin; i!= _oEnd; ++i)
-					{
-						b.add_point((*i))
+			if(!_bbox.IsNull()) {
+				this->bbox=_bbox;
+			} else {
+					for(i = _oBegin; i!= _oEnd; ++i) {
+						b.add_point((*i));
 						this->bbox.add_box(b);
 					}
-					bbox.Offset(bbox.diagonal()/100.0) ;
+					bbox.Offset(bbox.diagonal() / 100.0);
 			}
 
 			dim  = bbox.max() - bbox.min();

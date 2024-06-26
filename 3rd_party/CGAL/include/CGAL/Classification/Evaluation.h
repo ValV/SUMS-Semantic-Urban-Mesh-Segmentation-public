@@ -146,14 +146,15 @@ public:
   /// @{
 	  
     //**********************************Weixiao GAO update*****************************************
-  template <typename GroundTruthIndexRange, typename ResultIndexRange>
+  template <typename GroundTruthIndexRange, typename ResultIndexRange, typename WeightIndexRange>
   Evaluation(const Label_set& labels,
       const GroundTruthIndexRange& ground_truth,
       const ResultIndexRange& result,
-      const std::vector<float> weight)
+      // const std::vector<float>& weight)
+      const WeightIndexRange& weight)
       : m_precision(labels.size()),
-      m_recall(labels.size()),
-      m_iou(labels.size())
+        m_recall(labels.size()),
+        m_iou(labels.size())
   {
       for (std::size_t i = 0; i < labels.size(); ++i)
           m_map_labels[labels[i]] = i;
@@ -208,7 +209,7 @@ public:
       m_mean_iou /= correct_labels;
       m_mean_f1 /= correct_labels;
       m_accuracy = sum_true_positives / total;
-	  m_mean_accuracy /= float(labels.size());
+      m_mean_accuracy /= float(labels.size());
   }
   //*********************************************************************************************
 

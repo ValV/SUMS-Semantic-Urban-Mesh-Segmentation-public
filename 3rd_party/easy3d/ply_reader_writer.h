@@ -94,7 +94,7 @@ namespace easy3d {
 		{
 		public:
 			//------------------------------------------- Weixiao Update --------------------------------------------//
-			bool read(const std::string& file_name, std::vector<Element>& elements, std::vector<std::string> &textures = std::vector<std::string>());
+			bool read(const std::string& file_name, std::vector<Element>& elements, std::vector<std::string>& textures);
 			//------------------------------------------- -------------- --------------------------------------------//
 
 			// A quick check of the number of faces stored in the ply file (usually

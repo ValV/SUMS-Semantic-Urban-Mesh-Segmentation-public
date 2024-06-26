@@ -146,9 +146,10 @@ namespace easy3d {
         }
 
         if (!success || mesh->n_faces() == 0) {
+            success = false;
             std::cerr << "reading file failed (no data exist)" << std::endl;
             delete mesh;
-            return nullptr;
+            return success;
         }
 
 

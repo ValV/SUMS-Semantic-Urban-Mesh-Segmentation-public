@@ -50,8 +50,9 @@ namespace easy3d {
 
 		bool load_ply(const std::string& file_name, PointCloud* cloud) {
 			std::vector<Element> elements;
+			std::vector<std::string> textures;
 			PlyReader reader;
-			if (!reader.read(file_name, elements))
+			if (!reader.read(file_name, elements, textures))
 				return false;
 
 			for (std::size_t i = 0; i < elements.size(); ++i) {

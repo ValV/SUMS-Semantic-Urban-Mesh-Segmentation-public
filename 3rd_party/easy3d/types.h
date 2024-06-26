@@ -23,6 +23,7 @@
 #define EASY3D_TYPES_H
 
 #include <cstdint>
+#include <climits>
 
 #include <easy3d/vec.h>
 #include <easy3d/mat.h>

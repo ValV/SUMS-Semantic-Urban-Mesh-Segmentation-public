@@ -409,7 +409,7 @@ namespace easy3d {
 			return true;
 		}
 
-		bool PlyReader::read(const std::string& file_name, std::vector<Element>& elements, std::vector<std::string> &textures)
+		bool PlyReader::read(const std::string& file_name, std::vector<Element>& elements, std::vector<std::string>& textures)
 		{
 			p_ply ply = ply_open(file_name.c_str(), nullptr, 0, nullptr);
 			if (!ply) {

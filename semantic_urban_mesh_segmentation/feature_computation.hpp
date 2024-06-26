@@ -30,11 +30,12 @@
 #define semantic_mesh_segmentation__FEATURE_COMPUTATION_HPP
 
 
-#include <opencv2/opencv.hpp>
-#include <easy3d/kdtree.h>
-#include <easy3d/point_cloud.h>
-
 #include <omp.h>
+
+#include <opencv2/opencv.hpp>
+//#include <easy3d/kdtree.h>
+//#include <easy3d/point_cloud.h>
+
 #include <easy3d/kdtree.h>
 #include <easy3d/point_cloud.h>
 #include <easy3d/point_cloud_io.h>
@@ -51,12 +52,15 @@ namespace semantic_mesh_segmentation
 {
 	//------------------------------------------------ ------------------------------- ----------------------------------------------//
 	//--- bool comparision ---
-	//x coordinates compare
+	// x coordinates compare
 	inline bool smaller_coord
 	(
 		float x1,
 		float x2
-	) restrict(cpu)
+	)
+#ifdef _WIN32
+	restrict(cpu)
+#endif
 	{
 		if (x1 >= x2)
 			return false;
@@ -64,7 +68,7 @@ namespace semantic_mesh_segmentation
 			return true;
 	}
 
-	//superfcaet area compare
+	// Superfacet area compare
 	inline bool larger_segments_area
 	(
 		superfacets spf_1,
@@ -77,7 +81,7 @@ namespace semantic_mesh_segmentation
 			return false;
 	}
 
-	//superfacet size compare
+	// Superfacet size compare
 	inline bool larger_segment_size
 	(
 		superfacets spf_1,
@@ -125,7 +129,10 @@ namespace semantic_mesh_segmentation
 	(
 		SFMesh* smesh_out,
 		SFMesh::Face& f
-	) restrict(cpu)
+	)
+#ifdef _WIN32
+	restrict(cpu)
+#endif
 	{
 		vec3 v0, v1, v2;
 		int ind = 0;
@@ -346,7 +353,10 @@ namespace semantic_mesh_segmentation
 		DiagonalizeTraits::Vector &eigen_values,
 		DiagonalizeTraits::Matrix &eigen_vectors,
 		Plane &plane_c
-	) restrict(cpu)
+	)
+#ifdef _WIN32
+	restrict(cpu)
+#endif
 	{
 		auto points_coord = point_cloud->get_vertex_property<easy3d::vec3>("v:point");
 		std::vector<Point_3> sampling_point;
@@ -399,7 +409,7 @@ namespace semantic_mesh_segmentation
 			float z_diff = 1.0f;
 			if (multi_scales_seg_minmax_ele[i].second - multi_scales_seg_minmax_ele[i].first > 0)
 				z_diff = multi_scales_seg_minmax_ele[i].second - multi_scales_seg_minmax_ele[i].first;
-			seg_mulsc_ele_fea[i] = std::sqrtf((seg_center_z - multi_scales_seg_minmax_ele[i].first) / z_diff);
+			seg_mulsc_ele_fea[i] = sqrtf((seg_center_z - multi_scales_seg_minmax_ele[i].first) / z_diff);
 			value_validation_check(seg_mulsc_ele_fea[i]);
 		}
 	}
@@ -460,7 +470,7 @@ namespace semantic_mesh_segmentation
 	//------------------------------------------------ ------------------------------- ----------------------------------------------//
 	//------------------------------------------------  Features computation functions ----------------------------------------------//
 	//------------------------------------------------ ------------------------------- ----------------------------------------------//	
-	void merge_pointcloud(PTCloud *, PTCloud *, SFMesh *, int &, const int, std::map<int, int> &ptidx_faceid_map_all = std::map<int, int>());
+	void merge_pointcloud(PTCloud *, PTCloud *, SFMesh *, int &, const int, std::map<int, int> &ptidx_faceid_map_all);
 
 	void merge_mesh(SFMesh *, SFMesh *, int &, int &, int &, SFMesh *smesh_overseg = nullptr);
 

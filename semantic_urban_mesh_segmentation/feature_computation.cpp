@@ -411,10 +411,13 @@ namespace semantic_mesh_segmentation
 		PTCloud *cloud_all,
 		SFMesh *smesh_all,
 		int &pre_face_size,
-		const int sampled_or_ele_or_others, //0: sampled; 1: ele; 2: others
+		const int sampled_or_ele_or_others, //0: sampled; 1: else; 2: others
 		std::map<int, int> &ptidx_faceid_map_all
 	)
 	{
+//		if (ptidx_faceid_map_all == nullptr) {
+//			ptidx_faceid_map_all = &std::map<int, int>();
+//		}  // FIXME: remove
 		for (auto ptx : cloud_tmp->vertices())
 		{
 			cloud_all->add_vertex(cloud_tmp->get_points_coord[ptx]);
@@ -809,7 +812,8 @@ namespace semantic_mesh_segmentation
 			get_vert_medialball_check[vtx_now] = true;
 		}
 
-		cloud_3d_pt->remove_vertex_property(cloud_3d_pt->get_vertex_property<bool>("v:medialball_check"));
+		auto property = cloud_3d_pt->get_vertex_property<bool>("v:medialball_check");
+		cloud_3d_pt->remove_vertex_property(property);
 		delete tree3d;
 	}
 
@@ -1298,8 +1302,10 @@ namespace semantic_mesh_segmentation
 	)
 	{
 		merge_mesh(smesh_tmp, smesh_all, vert_ind, pre_sampled_cloud_size, tex_size, smesh_overseg);
-		merge_pointcloud(cloud_sampled_tmp, cloud_sampled_all, smesh_all, pre_face_size, 0);
-		merge_pointcloud(cloud_ele_tmp, cloud_ele_all, smesh_all, pre_face_size, 1);
+		auto ptidx_faceid_map_0 = std::map<int, int>();
+		merge_pointcloud(cloud_sampled_tmp, cloud_sampled_all, smesh_all, pre_face_size, 0, ptidx_faceid_map_0);
+		auto ptidx_faceid_map_1 = std::map<int, int>();
+		merge_pointcloud(cloud_ele_tmp, cloud_ele_all, smesh_all, pre_face_size, 1, ptidx_faceid_map_1);
 		merge_pointcloud(face_center_cloud_tmp, face_center_cloud_all, smesh_all, pre_face_size, 2, ptidx_faceid_map_all);
 
 		pre_face_size += smesh_tmp->faces_size();
@@ -1322,8 +1328,10 @@ namespace semantic_mesh_segmentation
 		pointcloud_configuration(cloud_ele_all);
 		pointcloud_configuration(face_center_cloud_all);
 
-		if (use_existing_mesh_segments)
-			read_mesh_data(smesh_overseg, batch_index);
+		if (use_existing_mesh_segments) {
+			auto texture_maps = std::vector<cv::Mat>();
+			read_mesh_data(smesh_overseg, batch_index, texture_maps);
+		}
 
 		int ind = 0, vert_ind = 0, pre_face_size = 0, pre_sampled_cloud_size = 0, tex_size = 0;
 		for (auto tile_i : batch_base_names)
@@ -1336,14 +1344,14 @@ namespace semantic_mesh_segmentation
 			std::map<int, int> ptidx_faceid_map_tmp;
 
 			std::cout << "Finished " << ind << " tiles (total " << batch_base_names.size() << " tiles), current ";
-			//--- read mesh *.ply data ---
+			// --- Read mesh *.ply data ---
 			read_mesh_data(smesh_tmp, tile_i.first, texture_maps);
 
-			//get facet texture if do not use sampling
+			// Get facet texture if do not use sampling
 			if (with_texture)
 				face_texture_processor(smesh_tmp, texture_maps, tile_i.first);
 
-			//--- sampling point cloud on mesh data ---
+			// --- Sampling point cloud on mesh data ---
 			if (is_pointclouds_exist)
 			{
 				read_pointcloud_data(smesh_tmp, cloud_sampled_tmp, 0, tile_i.first);
@@ -1354,7 +1362,7 @@ namespace semantic_mesh_segmentation
 				sampling_point_cloud_on_mesh(smesh_tmp, texture_maps, cloud_sampled_tmp, cloud_ele_tmp, face_center_cloud_tmp, ptidx_faceid_map_tmp, tile_i.first);
 			}
 
-			//--- merge mesh and point cloud ---
+			// --- Merge mesh and point cloud ---
 			if (use_existing_mesh_segments)
 				tiles_merge_to_batch(smesh_tmp, cloud_sampled_tmp, cloud_ele_tmp, face_center_cloud_tmp, smesh_all, cloud_sampled_all, cloud_ele_all, face_center_cloud_all, ptidx_faceid_map_all, vert_ind, pre_face_size, pre_sampled_cloud_size, tex_size, smesh_overseg);
 			else
@@ -1531,9 +1539,9 @@ namespace semantic_mesh_segmentation
 		}
 		std::vector<int> seg_truth, seg_ids;
 		std::vector<std::vector<int>> seg_face_vec;
-		std::vector< std::vector<float>> basic_feas;
-		std::vector< std::vector<float> > mulsc_ele_feas;
-		std::vector< std::vector<float> > eigen_feas, color_feas;
+		std::vector<std::vector<float>> basic_feas;
+		std::vector<std::vector<float> > mulsc_ele_feas;
+		std::vector<std::vector<float> > eigen_feas, color_feas;
 		get_all_feature_properties_from_feature_point_cloud
 		(
 			pcl_out, seg_face_vec, seg_ids, seg_truth,
@@ -1543,18 +1551,20 @@ namespace semantic_mesh_segmentation
 		SFMesh* smesh_all = new SFMesh, *smesh_overseg = new SFMesh;;
 		mesh_configuration(smesh_all);
 
-		if (use_existing_mesh_segments)
-			read_mesh_data(smesh_overseg, batch_index);
+		if (use_existing_mesh_segments) {
+			auto texture_maps = std::vector<cv::Mat>();
+			read_mesh_data(smesh_overseg, batch_index, texture_maps);
+		}
 
 		int ind = 0, vert_ind = 0, pre_sampled_cloud_size = 0, tex_size = 0;
-		for (auto tile_i : batch_base_names)
-		{
+		for (auto tile_i : batch_base_names) {
 			SFMesh *smesh_tmp = new SFMesh;
 
-			//--- read mesh *.ply data ---
-			read_mesh_data(smesh_tmp, tile_i.first);
+			// --- Read mesh *.ply data ---
+			auto texture_maps = std::vector<cv::Mat>();
+			read_mesh_data(smesh_tmp, tile_i.first, texture_maps);
 
-			//--- merge mesh ---
+			// --- Merge mesh ---
 			if (use_existing_mesh_segments)
 				merge_mesh(smesh_tmp, smesh_all, vert_ind, pre_sampled_cloud_size, tex_size, smesh_overseg);
 			else
@@ -1582,22 +1592,20 @@ namespace semantic_mesh_segmentation
 		delete pcl_out;
 	}
 
-	//--- processing visualization single tiles ---
+	// --- Processing visualization single tiles ---
 	void visualization_process_single_tiles(const int pi)
 	{
 		std::string sfc_in = base_names[pi];
 		easy3d::PointCloud* pcl_out = read_feature_pointcloud_data(sfc_in);
-		if (pcl_out == nullptr)
-		{
+		if (pcl_out == nullptr) {
 			std::cerr << "File loading failed" << std::endl;
 			throw std::exception();
 		}
 		std::vector<int> seg_truth, seg_ids;
 		std::vector<std::vector<int>> seg_face_vec;
-		std::vector< std::vector<float> > basic_feas, mulsc_ele_feas;
-		std::vector< std::vector<float> > eigen_feas, color_feas;
-		get_all_feature_properties_from_feature_point_cloud
-		(
+		std::vector<std::vector<float>> basic_feas, mulsc_ele_feas;
+		std::vector<std::vector<float>> eigen_feas, color_feas;
+		get_all_feature_properties_from_feature_point_cloud(
 			pcl_out, seg_face_vec, seg_ids, seg_truth,
 			basic_feas, eigen_feas, color_feas, mulsc_ele_feas
 		);
@@ -1605,7 +1613,8 @@ namespace semantic_mesh_segmentation
 		SFMesh *smesh_in = new SFMesh;
 		mesh_configuration(smesh_in);
 
-		read_mesh_data(smesh_in, pi);
+		auto texture_maps = std::vector<cv::Mat>();
+		read_mesh_data(smesh_in, pi, texture_maps);
 		SFMesh *smesh_out = new SFMesh;
 		visualization_feature_on_mesh
 		(

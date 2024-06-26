@@ -373,10 +373,9 @@ namespace semantic_mesh_segmentation
 		}
 
 		//!!!Warning, if use Intel-TBB here, must give following vectors with predefined size and value!!!
-		std::vector<float> label_value(clusters_test.size(), -1.0f); // note that this value = prob, votes = prob*num_trees
-		std::vector<float> label_prob;
 		int label_size = enable_joint_labeling == false ? labels_name.size() : labels_name.size() * 2;
-		label_prob = std::vector<float>(clusters_test.size() * label_size, 0.0f);
+		std::vector<float> label_value(clusters_test.size(), -1.0f); // note that this value = prob, votes = prob*num_trees
+		std::vector<float> label_prob(clusters_test.size() * label_size, 0.0f);
 		predict_prob_all = std::vector<std::vector<float>>(clusters_test.size(), 
 			std::vector<float>((label_size), 0.0f));
 			
@@ -585,9 +584,9 @@ namespace semantic_mesh_segmentation
 	(
 		SFMesh *smesh_in,
 		Label_set &labels,
-		std::vector<int> &face_predict_label,
-		std::vector<int> &face_truth_label,
-		std::vector<float> &face_area_weighted,
+		const std::vector<int> &face_predict_label,
+		const std::vector<int> &face_truth_label,
+		const std::vector<float> &face_area_weighted,
 		const int m
 	)
 	{
@@ -604,6 +603,7 @@ namespace semantic_mesh_segmentation
 			//Evaluation based on each face, not on segment!!!
 			std::cerr << "Precision, recall, F1 scores and IoU:" << std::endl;
 			CGAL::Classification::Evaluation evaluation(labels, face_truth_label, face_predict_label, face_area_weighted);
+			//CGAL::Classification::Evaluation evaluation(labels, face_truth_label, face_predict_label);
 			for (std::size_t i = 0; i < labels.size(); ++i)
 			{
 				std::cerr << " * " << labels[i]->name() << ": "
@@ -612,7 +612,9 @@ namespace semantic_mesh_segmentation
 					<< evaluation.f1_score(labels[i]) << " ; "
 					<< evaluation.intersection_over_union(labels[i]) << std::endl;
 			}
-			std::cerr << "Mean Accuracy = " << evaluation.mean_accuracy() << std::endl
+			// TODO: re-enable mean accuracy
+			std::cerr
+				// << "Mean Accuracy = " << evaluation.mean_accuracy() << std::endl
 				<< "Overall Accuracy = " << evaluation.accuracy() << std::endl
 				<< "mean F1 score = " << evaluation.mean_f1_score() << std::endl
 				<< "mean IoU = " << evaluation.mean_intersection_over_union() << std::endl;
@@ -664,15 +666,17 @@ namespace semantic_mesh_segmentation
 	void evaluation_all_test_data
 	(
 		Label_set &labels, 
-		std::vector<int> &face_truth_label,
-		std::vector<int> &face_test_label,
-		std::vector<float> &face_area_weighted,
+		const std::vector<int> &face_truth_label,
+		const std::vector<int> &face_test_label,
+		const std::vector<float> &face_area_weighted,
 		const int m
 	)
 	{
 		//Evaluation based on each face, not on segment!!!
 		std::cerr << "Precision, recall, F1 scores and IoU:" << std::endl;
+		// <std::vector<int>, std::vector<int>>
 		CGAL::Classification::Evaluation evaluation(labels, face_truth_label, face_test_label, face_area_weighted);
+		//CGAL::Classification::Evaluation evaluation(labels, face_truth_label, face_test_label);
 		for (std::size_t i = 0; i < labels.size(); ++i)
 		{
 			std::cerr << " * " << labels[i]->name() << ": "
@@ -681,7 +685,9 @@ namespace semantic_mesh_segmentation
 				<< evaluation.f1_score(labels[i]) << " ; "
 				<< evaluation.intersection_over_union(labels[i]) << std::endl;
 		}
-		std::cerr << "Mean Accuracy = " << evaluation.mean_accuracy() << std::endl
+		// TODO: re-enable mean accuracy
+		std::cerr
+			// << "Mean Accuracy = " << evaluation.mean_accuracy() << std::endl
 			<< "Overall Accuracy = " << evaluation.accuracy() << std::endl
 			<< "mean F1 score = " << evaluation.mean_f1_score() << std::endl
 			<< "mean IoU = " << evaluation.mean_intersection_over_union() << std::endl;

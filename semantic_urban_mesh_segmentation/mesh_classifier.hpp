@@ -34,10 +34,12 @@
 
 #include <omp.h>
 #include <typeinfo>
+
 #include <easy3d/surface_mesh.h>
 #include <easy3d/kdtree.h>
 #include <easy3d/point_cloud.h>
-#include <3rd_party/gco/GCoptimization.h>
+#include <gco/GCoptimization.h>
+
 #include "mesh_io.hpp"
 #include "parameters.hpp"
 #include "CGAL_Define.hpp"

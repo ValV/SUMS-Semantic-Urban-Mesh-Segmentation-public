@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 project(${PROJECT_NAME})
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH})
 
 set(${PROJECT_NAME}_HEADERS
@@ -23,7 +24,7 @@ set(${PROJECT_NAME}_HEADERS
 	./over_segmentation.hpp
 	./CGAL_Define.hpp
 	./mesh_processor.hpp
-    )
+)
 
 set(${PROJECT_NAME}_SOURCES
     ./main.cpp
@@ -36,7 +37,7 @@ set(${PROJECT_NAME}_SOURCES
 	./mesh_classifier.cpp
 	./over_segmentation.cpp
 	./mesh_processor.cpp
-    )
+)
 
 include_directories(${PROJECT_NAME} PRIVATE ${SemanticUrbanMesh_INCLUDE_DIR})
 

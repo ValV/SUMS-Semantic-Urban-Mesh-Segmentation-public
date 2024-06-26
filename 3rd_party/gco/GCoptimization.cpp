@@ -1,24 +1,28 @@
-#ifdef MATLAB_MEX_FILE
-#include <mex.h>
-#endif
-#include "GCoptimization.h"
-#include "LinkedBlockList.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <vector>
 #include <algorithm>
 
-// will leave this one just for the laughs :)
+#ifdef MATLAB_MEX_FILE
+#include <mex.h>
+#endif
+
+#include "LinkedBlockList.h"
+#include "GCoptimization.h"
+
+// Will leave this one just for the laughs :)
 //#define olga_assert(expr) assert(!(expr))
 
 // Choose reasonably high-precision timer (sub-millisec resolution if possible).
+namespace gco
+{
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #define NOMINMAX
 #include <windows.h>
-namespace gco
-{
+
 extern "C" gcoclock_t GCO_CLOCKS_PER_SEC = 0;
 
 extern "C" inline gcoclock_t gcoclock() // TODO: not thread safe; separate begin/end so that end doesn't have to check for query frequency
@@ -29,11 +33,8 @@ extern "C" inline gcoclock_t gcoclock() // TODO: not thread safe; separate begin
 	QueryPerformanceCounter((LARGE_INTEGER*)&result);
 	return result;
 }
-
 #else
-extern "C" {
-gcoclock_t GCO_CLOCKS_PER_SEC = CLOCKS_PER_SEC;
-}
+extern "C" gcoclock_t GCO_CLOCKS_PER_SEC = CLOCKS_PER_SEC;
 extern "C" gcoclock_t gcoclock() { return clock(); }
 #endif
 

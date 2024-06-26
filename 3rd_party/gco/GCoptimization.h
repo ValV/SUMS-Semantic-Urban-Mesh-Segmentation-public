@@ -106,9 +106,13 @@
 #endif
 
 #include <cstddef>
+
+#ifndef _WIN32
+#include <ctime>
+#endif
+
+#include "graph.h"
 #include "energy.h"
-#include "graph.cpp"
-#include "maxflow.cpp"
 
 /////////////////////////////////////////////////////////////////////
 // Utility functions, classes, and macros
@@ -125,9 +129,9 @@ public:
 #ifdef _WIN32
 typedef __int64 gcoclock_t;
 #else
-#include <ctime>
 typedef clock_t gcoclock_t;
 #endif
+
 extern "C" gcoclock_t gcoclock(); // fairly high-resolution timer... better than clock() when available
 extern "C" gcoclock_t GCO_CLOCKS_PER_SEC; // this variable will stay 0 until gcoclock() is called for the first time
 

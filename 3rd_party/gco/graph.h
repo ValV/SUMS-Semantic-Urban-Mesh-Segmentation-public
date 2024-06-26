@@ -39,10 +39,10 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
 
-#include <string.h>
+#include <cassert>
+#include <cstring>
 #include "block.h"
 
-#include <assert.h>
 // NOTE: in UNIX you need to use -DNDEBUG preprocessor option to supress assert's!!!
 
 

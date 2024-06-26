@@ -73,8 +73,9 @@
 #ifndef __ENERGY_H__
 #define __ENERGY_H__
 
-#include <assert.h>
+#include <cassert>
 #include "graph.h"
+
 namespace gco
 {
 template <typename captype, typename tcaptype, typename flowtype> class Energy: public Graph<captype,tcaptype,flowtype>

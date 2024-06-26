@@ -1,6 +1,7 @@
+#include <cstdio>
+#include <cstdlib>
+
 #include "LinkedBlockList.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 /*********************************************************************/
 namespace gco

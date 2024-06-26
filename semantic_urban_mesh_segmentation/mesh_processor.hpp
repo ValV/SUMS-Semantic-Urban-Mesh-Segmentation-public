@@ -29,11 +29,17 @@
 #ifndef semantic_mesh_segmentation__MESH_PROCESSOR_HPP
 #define semantic_mesh_segmentation__MESH_PROCESSOR_HPP
 
+#ifdef _WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <omp.h>
+#include <Python.h>
 #include <easy3d/point_cloud_io.h>
 #include <CGAL/linear_least_squares_fitting_3.h>
-#include <Python.h>
+
 #include "mesh_io.hpp"
 #include "feature_computation.hpp"
 #include "property_parsing.hpp"

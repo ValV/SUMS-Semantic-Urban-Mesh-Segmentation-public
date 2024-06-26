@@ -43,7 +43,7 @@ namespace semantic_mesh_segmentation
 		std::ostringstream temp_path;
 		temp_path << root_path << folder_names_level_0[2] << folder_names_level_1[0];
 		training_data_path = temp_path.str().data();
-		getAllFiles(training_data_path, file_formats[0], training_ply_files, training_file_folders);//get .ply filenames
+		getAllFiles(training_data_path, file_formats[0], training_ply_files, training_file_folders);  //get .ply filenames
 
 		int ind = 0;
 		for (auto str_i : training_ply_files)

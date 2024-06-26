@@ -80,7 +80,7 @@ namespace semantic_mesh_segmentation
 		SFMesh *,
 		const int,
 		SFMesh *smesh_seg = nullptr,
-		std::vector<cv::Mat> &texture_maps = std::vector<cv::Mat>(),
+		const std::vector<cv::Mat> &texture_maps = std::vector<cv::Mat>(),
 		const int batch_index = -1
 	);
 

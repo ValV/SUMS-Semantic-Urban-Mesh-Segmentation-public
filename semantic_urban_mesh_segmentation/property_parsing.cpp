@@ -28,6 +28,9 @@
 #include "property_parsing.hpp"
 
 using namespace easy3d;
+
+namespace fs = std::filesystem;
+
 namespace semantic_mesh_segmentation
 {
 	void sampling_point_cloud_on_mesh
@@ -164,8 +167,9 @@ namespace semantic_mesh_segmentation
 		//get sampled point cloud normals and face belong from mesh
 		match_ele_sampling_pointcloud_with_mesh_faces(smesh_in, cloud_ele, face_center_cloud, center_cloud_tree);
 
-		//delete temporary vertex property
-		smesh_in->remove_vertex_property(smesh_in->get_vertex_property<bool>("v:vertex_visited"));
+		// Delete temporary vertex property
+		auto property = smesh_in->get_vertex_property<bool>("v:vertex_visited");
+		smesh_in->remove_vertex_property(property);
 
 		//output texture point cloud
 		if (save_tex_cloud)
@@ -219,7 +223,7 @@ namespace semantic_mesh_segmentation
 		}
 		const double t_total = omp_get_wtime();
 
-		//add temporary vertex property
+		// Add temporary vertex property
 		smesh_in->add_vertex_property<bool>("v:vertex_visited", false);
 		auto get_vert_visited = smesh_in->get_vertex_property<bool>("v:vertex_visited");
 
@@ -319,8 +323,9 @@ namespace semantic_mesh_segmentation
 		//get sampled point cloud normals and face belong from mesh
 		get_sampling_cloud_normals_from_mesh_faces(smesh_in, cloud_3d, face_center_cloud, tex_cloud_temp, center_cloud_tree, tex_tree);
 
-		//delete temporary vertex property
-		smesh_in->remove_vertex_property(smesh_in->get_vertex_property<bool>("v:vertex_visited"));
+		// Delete temporary vertex property
+		auto property = smesh_in->get_vertex_property<bool>("v:vertex_visited");
+		smesh_in->remove_vertex_property(property);
 
 		//output texture point cloud
 		if (save_tex_cloud)
@@ -553,9 +558,8 @@ namespace semantic_mesh_segmentation
 	{
 		input_mesh_configuration(smesh);
 
-		//get texture information
-		if (with_texture)
-		{
+		// Get texture information
+		if (with_texture) {
 			if (!smesh->get_face_property<int>("f:texnumber"))
 				smesh->add_face_property<int>("f:texnumber", 0);
 			smesh->get_face_texnumber = smesh->get_face_property<int>("f:texnumber");
@@ -569,13 +573,10 @@ namespace semantic_mesh_segmentation
 				cv::Mat dummy(1, 1, CV_8UC3, cv::Scalar(0, 255, 0));
 				texture_maps.emplace_back(dummy);
 				with_texture = false;
-			}
-			else
-			{
+			} else {
 				//create batch predict folder 
 				std::string basic_write_path;
-				if (save_textures_in_predict)
-				{
+				if (save_textures_in_predict) {
 					if (processing_mode == 0) //RF
 						basic_write_path = root_path + folder_names_level_0[4] + folder_names_level_1[train_test_predict_val];
 					else if (processing_mode == 1) //SOTA
@@ -583,11 +584,14 @@ namespace semantic_mesh_segmentation
 
 					basic_write_path += prefixs[9] + std::to_string(batch_index);
 					if (0 != access(basic_write_path.c_str(), 0))
+#ifdef _WIN32
 						mkdir(basic_write_path.c_str());
+#else
+						fs::create_directories(basic_write_path);
+#endif
 				}
 
-				for (auto tex_i : smesh->textures)
-				{
+				for (auto tex_i : smesh->textures) {
 					if (!tex_i.empty() && tex_i[tex_i.size() - 1] == '\r')
 						tex_i.erase(tex_i.size() - 1);
 					smesh->texture_names.push_back(tex_i);
@@ -604,16 +608,14 @@ namespace semantic_mesh_segmentation
 					std::string texture_str_temp = texture_str_ostemp.str().data();
 					char * texturePath_temp = (char *)texture_str_temp.data();
 					cv::Mat texture_map = cv::imread(texturePath_temp);
-					if (texture_map.empty())
-					{
+					if (texture_map.empty()) {
 						std::cout << "read texture failure or no texture provide!" << std::endl;
 						cv::Mat dummy(128, 128, CV_8UC3, cv::Scalar(0, 255, 0));
 						texture_map = dummy;
 					}
 					texture_maps.emplace_back(texture_map);
 
-					if (save_textures_in_predict)
-					{
+					if (save_textures_in_predict) {
 						std::string current_write_path = basic_write_path + "/";
 						current_write_path += tex_i;
 						std::ostringstream write_texture_str_ostemp;
@@ -626,29 +628,25 @@ namespace semantic_mesh_segmentation
 			}
 		}
 
-		//get over-segmented mesh information
-		if (use_existing_mesh_segments)
-		{
-			if (smesh_seg->get_face_property<int>("f:face_segment_id"))
+		// Get over-segmented mesh information
+		if (use_existing_mesh_segments) {
+			if (smesh_seg->get_face_property<int>("f:face_segment_id")) {
 				smesh_seg->get_face_segment_id = smesh_seg->get_face_property<int>("f:face_segment_id");
-			else
-			{
+			} else {
 				smesh_seg->add_face_property<int>("f:face_segment_id", -1);
 				smesh_seg->get_face_segment_id = smesh_seg->get_face_property<int>("f:face_segment_id");
 			}
 		}
 
-		//pre-compute mesh properties
+		// Pre-compute mesh properties
 		smesh->class_area.resize(labels_name.size());
-		for (auto fi : smesh->faces())
-		{
+		for (auto fi : smesh->faces()) {
 			smesh->get_face_normals[fi] = smesh->compute_face_normal(fi);
 			smesh->get_face_area[fi] = FaceArea(smesh, fi);
 			smesh->get_face_tile_index[fi] = mi;
 
 			//unclassified = 0, unlabeled = -1
-			if (smesh->get_face_truth_label[fi] != 0 && smesh->get_face_truth_label[fi] != -1)
-			{
+			if (smesh->get_face_truth_label[fi] != 0 && smesh->get_face_truth_label[fi] != -1) {
 				smesh->mesh_area += smesh->get_face_area[fi];
 				smesh->class_area[smesh->get_face_truth_label[fi] - 1] += smesh->get_face_area[fi];
 			}

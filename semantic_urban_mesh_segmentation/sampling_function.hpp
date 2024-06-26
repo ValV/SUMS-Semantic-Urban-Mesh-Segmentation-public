@@ -28,30 +28,33 @@
 #pragma once
 #ifndef semantic_mesh_segmentation__SAMPLING_FUNCTION_HPP
 #define semantic_mesh_segmentation__SAMPLING_FUNCTION_HPP
+
 #include <algorithm>
 #include <random>
+
 #include <easy3d/point_cloud.h>
+
+#include "spatial_hashing.hpp"
 #include "super_segment.hpp"
 #include "math_base.hpp"
 #include "random_generator.hpp"
-#include "spatial_hashing.hpp"
 
 namespace semantic_mesh_segmentation
 {
-	typedef typename SpatialHashTable<easy3d::vec3> MontecarloSHT;
-	typedef typename SpatialHashTable<easy3d::vec3>::CellIterator MontecarloSHTIterator;
-	typedef typename SpatialHashTable<easy3d::vec3> SampleSHT;
-	typedef typename SpatialHashTable<easy3d::vec3>::CellIterator SampleSHTIterator;
+	typedef typename semantic_mesh_segmentation::SpatialHashTable<easy3d::vec3> MontecarloSHT;
+	typedef typename semantic_mesh_segmentation::SpatialHashTable<easy3d::vec3>::CellIterator MontecarloSHTIterator;
+	typedef typename semantic_mesh_segmentation::SpatialHashTable<easy3d::vec3> SampleSHT;
+	typedef typename semantic_mesh_segmentation::SpatialHashTable<easy3d::vec3>::CellIterator SampleSHTIterator;
 
 	// \brief Estimate the radius r that you should give to get a certain number of samples in a Poissson Disk Distribution of radius r.
 	inline float ComputePoissonDiskRadius(const float &area_temp, const int sampling_points_number)
 	{
-		return sqrt(area_temp / (0.7 * M_PI * sampling_points_number));// 0.7 is a density factor
+		return sqrt(area_temp / (0.7 * M_PI * sampling_points_number));  // 0.7 is a density factor
 	}
 
 	inline random_generator::MarsenneTwisterRNG &SamplingRandomGenerator()
 	{
-		static random_generator::MarsenneTwisterRNG rnd;//make it not change each time when use it.
+		static random_generator::MarsenneTwisterRNG rnd;  //make it not change each time when use it
 		return rnd;
 	}
 

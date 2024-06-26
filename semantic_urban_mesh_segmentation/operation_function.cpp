@@ -833,7 +833,8 @@ namespace semantic_mesh_segmentation
 							read_labeled_mesh_data(smesh_original, mi);
 
 							SFMesh *smesh_seg = new SFMesh;
-							read_mesh_data(smesh_seg, mi);
+							auto texture_maps = std::vector<cv::Mat>();  // FIXME: change read_mesh_data
+							read_mesh_data(smesh_seg, mi, texture_maps);
 
 							conversion_from_ground_truth(smesh_seg, label_seg_statistics);
 

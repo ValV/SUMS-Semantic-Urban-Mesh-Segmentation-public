@@ -29,9 +29,15 @@
 #ifndef semantic_mesh_segmentation__MESH_IO_HPP
 #define semantic_mesh_segmentation__MESH_IO_HPP
 
-#include <filesystem>
+#ifdef _WIN32
 #include <direct.h>
 #include <io.h>
+#else
+#include <unistd.h>
+#include <sys/stat.h>
+#endif
+
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <iomanip>
@@ -51,6 +57,9 @@
 #include "parameters.hpp"
 #include "PTCloud.hpp"
 #include "CGAL_Define.hpp"
+
+
+namespace fs = std::filesystem;
 
 namespace semantic_mesh_segmentation
 {
@@ -79,16 +88,22 @@ namespace semantic_mesh_segmentation
 
 	inline std::string get_file_based_name(const std::string &str)
 	{
-		char * file = (char *)str.data();
-		char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFname[_MAX_FNAME], szExt[_MAX_EXT];
-		_splitpath(file, szDrive, szDir, szFname, szExt);
+		// FIXME: remove commented code below
+		//char *file = (char *) str.data();
+		auto filename = fs::path(str.data()).stem().string(); // requires C++ 17 and above
+//#ifdef _WIN32
+//		char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFname[_MAX_FNAME], szExt[_MAX_EXT];
+//		_splitpath(file, szDrive, szDir, szFname, szExt);
+//#else
+//		char szFname[NAME_MAX], szExt[_MAX_EXT];
+//#endif
 
-		//separate char
+		// Separate char
 		char *delim = "_";
 		std::string base_name = "";
-		char *tmp = strtok(szFname, delim);
-		while (tmp != NULL)
-		{
+		//char *tmp = strtok(szFname, delim);
+		char *tmp = strtok(filename.data(), delim);
+		while (tmp != NULL) {
 			bool is_ignore = false;
 			for (auto ig_str : ignored_str)
 			{
@@ -106,7 +121,7 @@ namespace semantic_mesh_segmentation
 				base_name += tmp;
 			}
 
-			tmp = strtok(NULL, delim);
+			tmp = strtok(NULL, delim);  // tmp = NULL
 		}
 
 		return base_name;
@@ -123,7 +138,7 @@ namespace semantic_mesh_segmentation
 
 	easy3d::PointCloud* read_semantic_pointcloud_data(const int);
 
-	void read_mesh_data(SFMesh *, const int, std::vector<cv::Mat> &texture_maps = std::vector<cv::Mat>(), const int batch_index = -1);
+	void read_mesh_data(SFMesh *, const int, std::vector<cv::Mat> &texture_maps, const int batch_index = -1);  // FIXME: const ref texture_maps
 
 	void read_test_mesh_data(SFMesh *, const int);
 

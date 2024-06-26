@@ -25,9 +25,14 @@
 *				  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+//#include "CGAL/Classification/Evaluation.h"
+
 #include "mesh_io.hpp"
 
 using namespace easy3d;
+
+namespace fs = std::filesystem;
+
 namespace semantic_mesh_segmentation
 {
 	//--------------------------------------------Read data -------------------------------------------------//
@@ -36,52 +41,47 @@ namespace semantic_mesh_segmentation
 	path:	input folder path
 	files:	 files in the folder or subfolder
 	*/
-	void getAllFiles(const std::string& folder_path, const std::string&file_format, std::vector<std::string> &file_names, std::vector<std::string> &folder_names)
+#ifdef _WIN32
+	void getAllFiles(
+			const std::string& folder_path,
+			const std::string& file_format,
+			std::vector<std::string> &file_names,
+			std::vector<std::string> &folder_names)
 	{
 		_finddata_t file;
-		std::string filename = folder_path + "*.*";// file_format;//"\\*.jpg"
+		std::string filename = folder_path + "*.*";  // file_format;  // "\\*.jpg"
+		std::cout << "DEBUG: find filename = " << filename << std::endl;  // FIXME: remove (debug)
 		intptr_t flag = _findfirst(filename.c_str(), &file);
 		std::map<std::string, bool> is_folder_visited;
-		if (flag == -1L)
-		{
+		if (flag == -1L) {
 			std::cerr << "There is no such folder or file." << std::endl;
 			throw std::exception();
-		}
-		else
-		{
-			do
-			{
+		} else {
+			do {
 				//if subdirectory
-				if (file.attrib & _A_SUBDIR)
-				{
-					if ((strcmp(file.name, ".") != 0) && (strcmp(file.name, "..") != 0))
-					{
+				if (file.attrib & _A_SUBDIR) {
+					if ((strcmp(file.name, ".") != 0) && (strcmp(file.name, "..") != 0)) {
 						std::string newPath = folder_path + file.name + "/";
 						getAllFiles(newPath, file_format, file_names, folder_names);
 					}
-				}
-				else
-				{
+				} else {
 					//separate char
 					char *delim = ".";
 					char *tmp = strtok(file.name, delim);
 					bool is_input_format = false;
-					while (tmp != NULL)
-					{
+					while (tmp != NULL) {
 						if (tmp == file_format)
 							is_input_format = true;
 						tmp = strtok(NULL, delim);
 					}
 
 					std::string file_name;
-					if (is_input_format)
-					{
+					if (is_input_format) {
 						file_name = folder_path + file.name + delim + file_format;
 						file_names.push_back(file_name);
 
 						auto it = is_folder_visited.find(folder_path);
-						if (it == is_folder_visited.end())
-						{
+						if (it == is_folder_visited.end()) {
 							is_folder_visited[folder_path] = true;
 							folder_names.push_back(folder_path);
 						}
@@ -91,6 +91,29 @@ namespace semantic_mesh_segmentation
 		}
 		_findclose(flag);
 	}
+#else
+	void getAllFiles(
+			const std::string& folder_path,
+			const std::string& file_format,
+			std::vector<std::string>& file_names,
+			std::vector<std::string>& folder_names)
+	{
+		for (auto const& dir_entry : fs::recursive_directory_iterator(folder_path)) {
+			std::cout << "DEBUG: directory entry = " << dir_entry << std::endl;
+			auto filename = fs::path(dir_entry.path());
+			std::cout << "DEBUG: filename = " << filename << std::endl;
+			if (dir_entry.is_regular_file() && filename.extension() == file_format) {
+				file_names.push_back(dir_entry.path());
+				std::cout << "DEBUG: added file [0] = " << filename.filename() << std::endl;
+				std::cout << "DEBUG: added file [1] = " << dir_entry.path() << std::endl;
+			} else if (dir_entry.is_directory()) {
+				folder_names.push_back(dir_entry.path());
+				std::cout << "DEBUG: added directory [0] = " << filename.filename() << std::endl;
+				std::cout << "DEBUG: added directory [1] = " << dir_entry.path() << std::endl;
+			}
+		}
+	}
+#endif
 
 	void rply_input
 	(
@@ -397,7 +420,10 @@ namespace semantic_mesh_segmentation
 		const int batch_index
 	)
 	{
-		//get over-segmented mesh
+//		if (texture_maps == nullptr) {
+//			texture_maps = std::vector<cv::Mat>();
+//		}  // FIXME: remove
+		// Get over-segmented mesh
 		std::ostringstream mesh_seg_str_ostemp;
 		SFMesh *mesh_seg = new SFMesh;
 		if (use_existing_mesh_segments)
@@ -1860,7 +1886,11 @@ namespace semantic_mesh_segmentation
 			basic_write_path += prefixs[9] + std::to_string(mi);
 			if (0 != access(basic_write_path.c_str(), 0))
 			{
+#ifdef _WIN32
 				mkdir(basic_write_path.c_str());
+#else
+				fs::create_directories(fs::path(basic_write_path));
+#endif
 			}
 			basic_write_path += "/";
 		}
@@ -2310,8 +2340,9 @@ namespace semantic_mesh_segmentation
 			fout << std::fixed << std::showpoint << std::setprecision(6) << evaluation.intersection_over_union(labels[i]) << "\n";
 		}
 
-		fout << "Mean_Accuracy" << "\t";
-		fout << std::fixed << std::showpoint << std::setprecision(6) << evaluation.mean_accuracy() << "\n";
+		// TODO: re-enable mean accuracy
+		// fout << "Mean_Accuracy" << "\t";
+		// fout << std::fixed << std::showpoint << std::setprecision(6) << evaluation.mean_accuracy() << "\n";
 		fout << "Overall_Accuracy" << "\t";
 		fout << std::fixed << std::showpoint << std::setprecision(6) << evaluation.accuracy() << "\n";
 		fout << "Mean_F1_score" << "\t";
